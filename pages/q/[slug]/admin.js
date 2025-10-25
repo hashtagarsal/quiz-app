@@ -107,6 +107,7 @@ export default function AdminDashboard() {
                   <th className="text-left p-4 font-semibold">Score</th>
                   <th className="text-left p-4 font-semibold">Percentage</th>
                   <th className="text-left p-4 font-semibold">Completed At</th>
+                  <th className="text-left p-4 font-semibold">Report</th>
                 </tr>
               </thead>
               <tbody>
@@ -136,6 +137,18 @@ export default function AdminDashboard() {
                       <td className="p-4 text-sm text-gray-600">
                         {new Date(attempt.finished_at).toLocaleString()}
                       </td>
+                      <td className="p-4">
+                        <button
+                          onClick={() => {
+                            const reportUrl = `${window.location.origin}/report/${attempt.id}`;
+                            navigator.clipboard.writeText(reportUrl);
+                            alert('Report link copied! Share this with the participant.');
+                          }}
+                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium"
+                        >
+                          Copy Report Link
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -147,4 +160,3 @@ export default function AdminDashboard() {
     </Layout>
   );
 }
-
