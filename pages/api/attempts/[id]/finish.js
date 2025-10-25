@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       .from('responses')
       .select('*')
       .eq('attempt_id', id)
-      .order('created_at', { ascending: true }); // Get oldest first
+      .order('created_at', { ascending: false }); // Get oldest first
 
     // Remove duplicates - keep only the FIRST response for each question
     const responses = [];

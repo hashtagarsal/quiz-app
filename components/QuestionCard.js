@@ -1,9 +1,7 @@
+// components/QuestionCard.js
+
 export default function QuestionCard({ 
-  question, 
-  options, 
-  selectedOption, 
-  onSelect, 
-  isLocked 
+  // ... props
 }) {
   return (
     <div className="bg-white border-2 rounded-lg p-8 space-y-6">
@@ -14,12 +12,13 @@ export default function QuestionCard({
           return (
             <button
               key={idx}
-              onClick={() => !isLocked && onSelect(option)}
-              disabled={isLocked}
+              // ❌ OLD LOGIC: onClick={() => !isLocked && onSelect(option)}
+              // ✅ NEW LOGIC: Check isLocked BEFORE onSelect is called
+              onClick={() => onSelect(option)} // ⬅️ Remove the !isLocked check here.
+              disabled={isLocked || isSelected} // ⬅️ CRUCIAL FIX: Ensure buttons are disabled once selected or locked.
               className={`w-full p-4 rounded-lg text-left transition ${
                 isSelected
                   ? 'bg-blue-500 text-white'
-                  : isLocked
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : 'bg-gray-50 hover:bg-gray-100'
               }`}
