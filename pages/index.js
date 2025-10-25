@@ -10,7 +10,7 @@ export default function Home() {
           <p className="text-gray-600">Create interactive quizzes and share them instantly</p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="max-w-md mx-auto">
           <Link
             href="/create"
             className="block p-8 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition space-y-2 text-center"
@@ -18,11 +18,6 @@ export default function Home() {
             <div className="text-2xl font-bold">Create Quiz</div>
             <div className="text-sm opacity-90">Build a new quiz from JSON</div>
           </Link>
-          
-          <div className="p-8 bg-green-500 text-white rounded-lg space-y-2 text-center">
-            <div className="text-2xl font-bold">Take Quiz</div>
-            <div className="text-sm opacity-90">Enter quiz code in URL: /q/CODE/enter</div>
-          </div>
         </div>
       </div>
     </Layout>
