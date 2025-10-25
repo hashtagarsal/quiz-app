@@ -15,14 +15,15 @@ export default async function handler(req, res) {
   try {
     const supabase = getServiceSupabase();
 
-    const { data: existing } = await supabase
+    // Check if already answered - FIX: Don't use .single()
+    const { data: existing, error: checkError } = await supabase
       .from('responses')
       .select('id')
       .eq('attempt_id', id)
-      .eq('question_idx', question_idx)
-      .single();
+      .eq('question_idx', question_idx);
 
-    if (existing) {
+    // If we have any existing response, reject
+    if (existing && existing.length > 0) {
       return res.status(400).json({ error: 'Question already answered' });
     }
 

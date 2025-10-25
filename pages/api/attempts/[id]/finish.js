@@ -26,15 +26,31 @@ export default async function handler(req, res) {
       .eq('id', attempt.quiz_id)
       .single();
 
-    const { data: responses } = await supabase
+    const { data: allResponses } = await supabase
       .from('responses')
       .select('*')
-      .eq('attempt_id', id);
+      .eq('attempt_id', id)
+      .order('created_at', { ascending: true }); // Get oldest first
+
+    // Remove duplicates - keep only the FIRST response for each question
+    const responses = [];
+    const seenQuestions = new Set();
+    
+    allResponses.forEach(response => {
+      if (!seenQuestions.has(response.question_idx)) {
+        responses.push(response);
+        seenQuestions.add(response.question_idx);
+      }
+    });
 
     let score = 0;
+    
     responses.forEach(response => {
       const correctAnswer = quiz.raw_json[response.question_idx].answer;
-      if (response.selected_option === correctAnswer) {
+      const userAnswer = response.selected_option;
+      
+      // Trim whitespace and compare
+      if (userAnswer.trim() === correctAnswer.trim()) {
         score++;
       }
     });

@@ -10,7 +10,6 @@ export default async function handler(req, res) {
   try {
     const supabase = getServiceSupabase();
 
-    // Get attempt details
     const { data: attempt, error: attemptError } = await supabase
       .from('attempts')
       .select('*')
@@ -21,7 +20,6 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Attempt not found' });
     }
 
-    // Get quiz with all questions
     const { data: quiz, error: quizError } = await supabase
       .from('quizzes')
       .select('*')
@@ -32,19 +30,29 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Quiz not found' });
     }
 
-    // Get all responses
-    const { data: responses, error: responsesError } = await supabase
+    const { data: allResponses, error: responsesError } = await supabase
       .from('responses')
       .select('*')
       .eq('attempt_id', id)
-      .order('question_idx', { ascending: true });
+      .order('created_at', { ascending: true });
 
     if (responsesError) throw responsesError;
+
+    // Remove duplicates - keep only the FIRST response for each question
+    const responses = [];
+    const seenQuestions = new Set();
+    
+    allResponses.forEach(response => {
+      if (!seenQuestions.has(response.question_idx)) {
+        responses.push(response);
+        seenQuestions.add(response.question_idx);
+      }
+    });
 
     // Build detailed report
     const report = quiz.raw_json.map((question, idx) => {
       const response = responses.find(r => r.question_idx === idx);
-      const isCorrect = response?.selected_option === question.answer;
+      const isCorrect = response?.selected_option?.trim() === question.answer.trim();
 
       return {
         question_number: idx + 1,
