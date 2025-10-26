@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     const { data, error } = await supabase
       .from('quizzes')
       .insert(quizData)
-      .select()sss
+      .select()
       .single();
 
     if (error) throw error;
