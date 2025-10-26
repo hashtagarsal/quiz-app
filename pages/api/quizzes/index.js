@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { title, raw_json } = req.body;
+    const { title, raw_json, timer_minutes } = req.body;
 
     if (!raw_json) {
       return res.status(400).json({ error: 'raw_json is required' });
@@ -19,15 +19,22 @@ export default async function handler(req, res) {
     const ownerToken = generateToken();
     const supabase = getServiceSupabase();
 
+    const quizData = {
+      slug,
+      title: title || 'Untitled Quiz',
+      raw_json,
+      owner_token: ownerToken
+    };
+
+    // Add timer if provided
+    if (timer_minutes && timer_minutes > 0) {
+      quizData.timer_minutes = timer_minutes;
+    }
+
     const { data, error } = await supabase
       .from('quizzes')
-      .insert({
-        slug,
-        title: title || 'Untitled Quiz',
-        raw_json,
-        owner_token: ownerToken
-      })
-      .select()
+      .insert(quizData)
+      .select()sss
       .single();
 
     if (error) throw error;

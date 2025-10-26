@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
-import { Copy } from 'lucide-react';
+import { Copy, Clock } from 'lucide-react';
 
 export default function CreateQuiz() {
   const [title, setTitle] = useState('');
   const [jsonInput, setJsonInput] = useState('');
+  const [timerMinutes, setTimerMinutes] = useState('');
   const [createdQuiz, setCreatedQuiz] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,10 +17,20 @@ export default function CreateQuiz() {
     try {
       const rawJson = JSON.parse(jsonInput);
       
+      const payload = {
+        title,
+        raw_json: rawJson
+      };
+      
+      // Add timer if specified
+      if (timerMinutes && parseInt(timerMinutes) > 0) {
+        payload.timer_minutes = parseInt(timerMinutes);
+      }
+      
       const res = await fetch('/api/quizzes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, raw_json: rawJson })
+        body: JSON.stringify(payload)
       });
       
       const data = await res.json();
@@ -31,6 +42,7 @@ export default function CreateQuiz() {
       setCreatedQuiz(data);
       setTitle('');
       setJsonInput('');
+      setTimerMinutes('');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -131,6 +143,25 @@ export default function CreateQuiz() {
           </div>
           
           <div>
+            <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Timer (Optional)
+            </label>
+            <input
+              type="number"
+              value={timerMinutes}
+              onChange={(e) => setTimerMinutes(e.target.value)}
+              placeholder="Leave empty for no timer"
+              min="1"
+              max="180"
+              className="w-full p-3 border rounded-lg"
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Set time limit in minutes (e.g., 30 for 30 minutes). Leave empty for unlimited time.
+            </p>
+          </div>
+          
+          <div>
             <label className="block text-sm font-medium mb-2">Quiz JSON</label>
             <textarea
               value={jsonInput}
@@ -146,7 +177,7 @@ export default function CreateQuiz() {
             disabled={loading}
             className="w-full p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-semibold disabled:opacity-50"
           >
-            {loading ? 'Creating...' : 'Create Quiz'}
+            {loading ? 'Creating Quiz...' : 'Create Quiz'}
           </button>
         </div>
         

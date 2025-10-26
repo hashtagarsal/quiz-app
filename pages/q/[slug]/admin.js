@@ -108,6 +108,7 @@ export default function AdminDashboard() {
                   <th className="text-left p-4 font-semibold">Percentage</th>
                   <th className="text-left p-4 font-semibold">Report</th>
                   <th className="text-left p-4 font-semibold">Completed At</th>
+                  <th className="text-left p-4 font-semibold">Time Taken</th>
                 </tr>
               </thead>
               <tbody>
@@ -148,6 +149,9 @@ export default function AdminDashboard() {
                       </td>
                       <td className="p-4 text-sm text-gray-600">
                         {new Date(attempt.finished_at).toLocaleString()}
+                      </td>
+                      <td className="p-4 text-sm text-gray-600">
+                        {attempt.time_taken ? `${Math.floor(attempt.time_taken / 60)}m ${attempt.time_taken % 60}s` : '-'}
                       </td>
                     </tr>
                   );

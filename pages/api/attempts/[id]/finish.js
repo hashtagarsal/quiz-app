@@ -6,6 +6,7 @@ export default async function handler(req, res) {
   }
 
   const { id } = req.query;
+  const { time_taken } = req.body;
 
   try {
     const supabase = getServiceSupabase();
@@ -30,9 +31,9 @@ export default async function handler(req, res) {
       .from('responses')
       .select('*')
       .eq('attempt_id', id)
-      .order('created_at', { ascending: false }); // Get oldest first
+      .order('created_at', { ascending: true });
 
-    // Remove duplicates - keep only the FIRST response for each question
+    // Remove duplicates
     const responses = [];
     const seenQuestions = new Set();
     
@@ -49,18 +50,24 @@ export default async function handler(req, res) {
       const correctAnswer = quiz.raw_json[response.question_idx].answer;
       const userAnswer = response.selected_option;
       
-      // Trim whitespace and compare
       if (userAnswer.trim() === correctAnswer.trim()) {
         score++;
       }
     });
 
+    const updateData = {
+      score,
+      finished_at: new Date().toISOString()
+    };
+    
+    // Add time taken if provided
+    if (time_taken) {
+      updateData.time_taken = time_taken;
+    }
+
     const { error: updateError } = await supabase
       .from('attempts')
-      .update({
-        score,
-        finished_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', id);
 
     if (updateError) throw updateError;

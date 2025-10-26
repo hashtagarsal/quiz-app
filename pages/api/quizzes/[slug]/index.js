@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from('quizzes')
-      .select('id, slug, title, raw_json')
+      .select('id, slug, title, raw_json, timer_minutes')
       .eq('slug', slug)
       .single();
 
@@ -27,12 +27,11 @@ export default async function handler(req, res) {
       id: data.id,
       slug: data.slug,
       title: data.title,
-      questions
+      questions,
+      timer_minutes: data.timer_minutes
     });
   } catch (error) {
     console.error('Get quiz error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
-
-
