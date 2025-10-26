@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../../components/Layout';
 import QuestionCard from '../../../components/QuestionCard';
-import { ArrowRight } from 'lucide-react';
 
 export default function PlayQuiz() {
   const router = useRouter();
@@ -35,7 +34,7 @@ export default function PlayQuiz() {
   };
 
   const handleAnswer = async (option) => {
-    if (responses[currentIdx]) return;
+    if (responses[currentIdx]) return; // Already answered
     
     try {
       const res = await fetch(`/api/attempts/${attempt}/responses`, {
@@ -49,24 +48,33 @@ export default function PlayQuiz() {
       
       if (!res.ok) throw new Error('Failed to save response');
       
+      // Mark as answered
       setResponses({ ...responses, [currentIdx]: option });
+      
+      // Wait 1 second to show selection, then auto-advance
+      setTimeout(() => {
+        if (currentIdx === quiz.questions.length - 1) {
+          // Last question - finish quiz
+          finishQuiz();
+        } else {
+          // Move to next question
+          setCurrentIdx(currentIdx + 1);
+        }
+      }, 500); // 1 second delay
+      
     } catch (err) {
       alert(err.message);
     }
   };
 
-  const handleNext = async () => {
-    if (currentIdx === quiz.questions.length - 1) {
-      try {
-        await fetch(`/api/attempts/${attempt}/finish`, {
-          method: 'POST'
-        });
-        router.push(`/q/${slug}/complete`);
-      } catch (err) {
-        alert('Error finishing quiz');
-      }
-    } else {
-      setCurrentIdx(currentIdx + 1);
+  const finishQuiz = async () => {
+    try {
+      await fetch(`/api/attempts/${attempt}/finish`, {
+        method: 'POST'
+      });
+      router.push(`/q/${slug}/complete`);
+    } catch (err) {
+      alert('Error finishing quiz');
     }
   };
 
@@ -80,7 +88,6 @@ export default function PlayQuiz() {
 
   const question = quiz.questions[currentIdx];
   const isAnswered = !!responses[currentIdx];
-  const isLast = currentIdx === quiz.questions.length - 1;
 
   return (
     <Layout title={quiz.title}>
@@ -107,16 +114,13 @@ export default function PlayQuiz() {
         />
         
         {isAnswered && (
-          <button
-            onClick={handleNext}
-            className="w-full p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 font-semibold flex items-center justify-center gap-2"
-          >
-            {isLast ? 'Finish Quiz' : 'Next Question'}
-            <ArrowRight className="w-5 h-5" />
-          </button>
+          <div className="text-center text-gray-600 text-sm">
+            {currentIdx === quiz.questions.length - 1 
+              ? 'Finishing quiz...' 
+              : 'Moving to next question...'}
+          </div>
         )}
       </div>
     </Layout>
   );
 }
-
