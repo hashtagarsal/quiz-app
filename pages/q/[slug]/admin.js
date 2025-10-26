@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../../components/Layout';
-import { Users } from 'lucide-react';
+import { Users, ExternalLink } from 'lucide-react';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -106,13 +106,14 @@ export default function AdminDashboard() {
                   <th className="text-left p-4 font-semibold">Participant</th>
                   <th className="text-left p-4 font-semibold">Score</th>
                   <th className="text-left p-4 font-semibold">Percentage</th>
-                  <th className="text-left p-4 font-semibold">Completed At</th>
                   <th className="text-left p-4 font-semibold">Report</th>
+                  <th className="text-left p-4 font-semibold">Completed At</th>
                 </tr>
               </thead>
               <tbody>
                 {completedAttempts.map((attempt) => {
                   const percentage = ((attempt.score / quiz.question_count) * 100).toFixed(0);
+                  const reportUrl = `/report/${attempt.id}`;
                   
                   return (
                     <tr key={attempt.id} className="border-b last:border-b-0 hover:bg-gray-50">
@@ -134,20 +135,19 @@ export default function AdminDashboard() {
                           <span className="text-sm font-medium">{percentage}%</span>
                         </div>
                       </td>
+                      <td className="p-4">
+                        <a
+                          href={reportUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium"
+                        >
+                          View Report
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </td>
                       <td className="p-4 text-sm text-gray-600">
                         {new Date(attempt.finished_at).toLocaleString()}
-                      </td>
-                      <td className="p-4">
-                        <button
-                          onClick={() => {
-                            const reportUrl = `${window.location.origin}/report/${attempt.id}`;
-                            navigator.clipboard.writeText(reportUrl);
-                            alert('Report link copied! Share this with the participant.');
-                          }}
-                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium"
-                        >
-                          Copy Report Link
-                        </button>
                       </td>
                     </tr>
                   );
