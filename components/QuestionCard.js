@@ -1,4 +1,4 @@
-export default function QuestionCard({ 
+export default function QuestionCard({  // Updated
   question, 
   options, 
   selectedOption, 
