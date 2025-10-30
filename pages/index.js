@@ -22,10 +22,12 @@ export default function Home() {
           
           <Link
             href="/my-quizzes"
-            className="block p-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-center flex items-center justify-center gap-2"
+            className="block p-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-center"
           >
-            <List className="w-5 h-5" />
-            <span className="font-semibold">My Quizzes</span>
+            <div className="flex items-center justify-center gap-2">
+              <List className="w-5 h-5" />
+              <span className="font-semibold">My Quizzes</span>
+            </div>
           </Link>
         </div>
       </div>
