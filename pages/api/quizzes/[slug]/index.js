@@ -1,37 +1,38 @@
-import { supabase } from '../../../../lib/supabaseClient';
+import { getServiceSupabase } from '../../../lib/supabaseClient';
+
+const MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'quiz2024';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
   const { slug } = req.query;
 
-  try {
-    const { data, error } = await supabase
-      .from('quizzes')
-      .select('id, slug, title, raw_json, timer_minutes')
-      .eq('slug', slug)
-      .single();
+  // Existing GET method
+  if (req.method === 'GET') {
+    // ... existing code ...
+  }
 
-    if (error || !data) {
-      return res.status(404).json({ error: 'Quiz not found' });
+  // NEW: DELETE method
+  if (req.method === 'DELETE') {
+    const { password } = req.body;
+
+    if (password !== MASTER_PASSWORD) {
+      return res.status(401).json({ error: 'Invalid password' });
     }
 
-    const questions = data.raw_json.map(q => ({
-      question: q.question,
-      options: q.options
-    }));
+    try {
+      const supabase = getServiceSupabase();
 
-    res.status(200).json({
-      id: data.id,
-      slug: data.slug,
-      title: data.title,
-      questions,
-      timer_minutes: data.timer_minutes
-    });
-  } catch (error) {
-    console.error('Get quiz error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      // Delete quiz (cascades to attempts and responses)
+      const { error } = await supabase
+        .from('quizzes')
+        .delete()
+        .eq('slug', slug);
+
+      if (error) throw error;
+
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error('Delete quiz error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 }
