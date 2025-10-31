@@ -96,31 +96,33 @@ export default function PlayQuiz() {
   };
 
   const finishQuiz = async (timedOut = false) => {
-    // Clear timer
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
+  if (timerRef.current) {
+    clearInterval(timerRef.current);
+  }
+  
+  const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+  
+  try {
+    const res = await fetch(`/api/attempts/${attempt}/finish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ time_taken: timeTaken })
+    });
     
-    // Calculate time taken
-    const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+    const data = await res.json();
     
-    try {
-      await fetch(`/api/attempts/${attempt}/finish`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ time_taken: timeTaken })
-      });
-      
-      if (timedOut) {
-        router.push(`/q/${slug}/complete?timeout=true`);
-      } else {
-        router.push(`/q/${slug}/complete`);
-      }
-    } catch (err) {
-      alert('Error finishing quiz');
+    if (!res.ok) throw new Error('Failed to finish quiz');
+    
+    // Pass attempt ID to complete page
+    if (timedOut) {
+      router.push(`/q/${slug}/complete?timeout=true&attempt=${attempt}`);
+    } else {
+      router.push(`/q/${slug}/complete?attempt=${attempt}`);
     }
-  };
-
+  } catch (err) {
+    alert('Error finishing quiz');
+  }
+};
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

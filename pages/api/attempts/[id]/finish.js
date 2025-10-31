@@ -60,7 +60,6 @@ export default async function handler(req, res) {
       finished_at: new Date().toISOString()
     };
     
-    // Add time taken if provided
     if (time_taken) {
       updateData.time_taken = time_taken;
     }
@@ -72,7 +71,13 @@ export default async function handler(req, res) {
 
     if (updateError) throw updateError;
 
-    res.status(200).json({ success: true, score });
+    // Return score, total questions, and attempt_id
+    res.status(200).json({ 
+      success: true, 
+      score,
+      total_questions: quiz.raw_json.length,
+      attempt_id: id
+    });
   } catch (error) {
     console.error('Finish attempt error:', error);
     res.status(500).json({ error: 'Internal server error' });
