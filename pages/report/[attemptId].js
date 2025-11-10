@@ -173,6 +173,25 @@ export default function ParticipantReport() {
                       ))}
                     </div>
                   </div>
+
+                  {/* EXPLANATION SECTION */}
+                  {q.reason && (
+                    <div className={`mt-4 p-4 rounded-lg ${
+                      q.is_correct ? 'bg-blue-50 border border-blue-200' : 'bg-yellow-50 border border-yellow-200'
+                    }`}>
+                      <div className="flex items-start gap-2">
+                        <span className="text-lg">💡</span>
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm text-gray-700 mb-1">
+                            Explanation:
+                          </div>
+                          <p className="text-sm text-gray-700">
+                            {q.reason}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

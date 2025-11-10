@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
     if (responsesError) throw responsesError;
 
-    // Remove duplicates - keep only the FIRST response for each question
+    // Remove duplicates
     const responses = [];
     const seenQuestions = new Set();
     
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
       }
     });
 
-    // Build detailed report
+    // Build detailed report with reasons
     const report = quiz.raw_json.map((question, idx) => {
       const response = responses.find(r => r.question_idx === idx);
       const isCorrect = response?.selected_option?.trim() === question.answer.trim();
@@ -60,7 +60,8 @@ export default async function handler(req, res) {
         options: question.options,
         correct_answer: question.answer,
         user_answer: response?.selected_option || 'Not answered',
-        is_correct: isCorrect
+        is_correct: isCorrect,
+        reason: question.reason || null
       };
     });
 

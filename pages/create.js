@@ -22,7 +22,6 @@ export default function CreateQuiz() {
         raw_json: rawJson
       };
       
-      // Add timer if specified
       if (timerMinutes && parseInt(timerMinutes) > 0) {
         payload.timer_minutes = parseInt(timerMinutes);
       }
@@ -166,7 +165,7 @@ export default function CreateQuiz() {
             <textarea
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}
-              placeholder='[{"question":"What is 2+2?","options":["3","4","5"],"answer":"4"}]'
+              placeholder='[{"question":"What is 2+2?","options":["3","4","5"],"answer":"4","reason":"Explanation here"}]'
               className="w-full p-3 border rounded-lg font-mono text-sm"
               rows={12}
             />
@@ -181,22 +180,27 @@ export default function CreateQuiz() {
           </button>
         </div>
         
-        <div className="bg-gray-50 p-4 rounded-lg text-sm">
+        <div className="bg-gray-50 p-4 rounded-lg text-sm space-y-2">
           <div className="font-semibold mb-2">Example Format:</div>
           <pre className="bg-white p-3 rounded overflow-x-auto text-xs">
 {`[
   {
     "question": "What is 2+2?",
     "options": ["3", "4", "5", "6"],
-    "answer": "4"
+    "answer": "4",
+    "reason": "Addition: 2 plus 2 equals 4 by basic arithmetic."
   },
   {
-    "question": "Capital of France?",
+    "question": "What is the capital of France?",
     "options": ["London", "Berlin", "Paris", "Madrid"],
-    "answer": "Paris"
+    "answer": "Paris",
+    "reason": "Paris has been the capital of France since 987 AD."
   }
 ]`}
           </pre>
+          <p className="text-xs text-gray-600 mt-2">
+            <strong>Note:</strong> The "reason" field is optional. If provided, it will be shown in the participant's report as an explanation.
+          </p>
         </div>
       </div>
     </Layout>
